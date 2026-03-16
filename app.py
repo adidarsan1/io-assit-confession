@@ -26,10 +26,19 @@ Rules to avoid Loophole (Defense-Proofing):
 5. PROCEDURAL FLAWS: Refer to recent High Court/Supreme Court standards (ensure time of arrest and seizure are consistent).
 6. LANGUAGE: Convert Tanglish (e.g., 'knife-ah ditch-la thooki potten') into High-Level Legal Tamil (e.g., 'கத்தியை சாக்கடையில் வீசி எறிந்தேன்').
 
-Format:
-- Header: சம்பவ இட ஆய்வு மகஜர் / ஒப்புதல் வாக்குமூலம்
-- Body: Professional Legal Prose
-- Signature Clause: "சாட்சிகளுக்கு வாசித்துக் காட்டப்பட்டு சம்மதம் பெறப்பட்டது."
+Format your response EXACTLY like this with these exact sections:
+
+--- DRAFT ---
+(Header: சம்பவ இட ஆய்வு மகஜர் / ஒப்புதல் வாக்குமூலம்)
+(Body: Professional Legal Prose)
+(Signature Clause: "சாட்சிகளுக்கு வாசித்துக் காட்டப்பட்டு சம்மதம் பெறப்பட்டது.")
+
+--- DEFENSE_RISK_ANALYSIS ---
+Provide a bulleted list of missing details from the IO's input that the defense lawyer could exploit in court. Examples:
+- "Light source not mentioned. Defense will claim it was too dark to see."
+- "Witnesses names not provided. Need 2 independent witnesses."
+- "Time of arrest/seizure missing."
+(Translate this analysis conceptually into clear English for the IO).
 """
 
 # 3. Streamlit UI (The "Anti-Gravity" Theme)
@@ -90,7 +99,20 @@ with col1:
                         data = resp.json()
                         candidates = data.get("candidates", [])
                         if candidates:
-                            st.session_state.output = candidates[0]["content"]["parts"][0]["text"]
+                            raw_resp = candidates[0]["content"]["parts"][0]["text"]
+                            draft_part = raw_resp
+                            risk_part = ""
+                            
+                            # Parse out the two sections we defined in the prompt
+                            if "--- DEFENSE_RISK_ANALYSIS ---" in raw_resp:
+                                parts = raw_resp.split("--- DEFENSE_RISK_ANALYSIS ---")
+                                draft_part = parts[0].replace("--- DRAFT ---", "").strip()
+                                risk_part = parts[1].strip()
+                            else:
+                                draft_part = raw_resp.replace("--- DRAFT ---", "").strip()
+                                
+                            st.session_state.output = draft_part
+                            st.session_state.defense_risks = risk_part
                         else:
                             st.error("🚨 Error: Empty response from Gemini. Try adding more notes.")
                     elif resp.status_code == 400:
@@ -109,7 +131,13 @@ with col1:
 with col2:
     st.markdown("### 📜 CCTNS Ready Draft")
     if 'output' in st.session_state:
-        st.text_area("Copy this to CCTNS:", value=st.session_state.output, height=450)
+        st.text_area("Copy this to CCTNS:", value=st.session_state.output, height=250)
+        
+        # Display Defense Risk Analysis below the draft in a visual warning box
+        if st.session_state.get('defense_risks'):
+            st.markdown("### 🛡️ Defense Risk Analysis")
+            st.warning(st.session_state.defense_risks)
+            
         st.success("Defense-Proofing Clauses Added Successfully!")
     else:
         st.info("The formal draft will appear here.")
