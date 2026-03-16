@@ -70,7 +70,7 @@ with col1:
                 import requests
                 
                 # Direct REST call to bypass Streamlit Cloud gRPC/routing issues
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={GOOGLE_API_KEY}"
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GOOGLE_API_KEY}"
                 
                 full_prompt = f"{SYSTEM_PROMPT}\n\nDocument Type: {doc_type}\nCase Info: {fir_details}, {station}\nInput: {raw_input}"
                 
