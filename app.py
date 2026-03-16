@@ -78,59 +78,59 @@ raw_input = st.text_area("Example: Accused knife-ah bridge pakkam ditch-la hidde
 if st.button("🚀 GENERATE LEGAL DRAFT", type="primary"):
     if not raw_input:
         st.error("Please enter some notes!")
-        else:
-            with st.spinner("Processing with Anti-Gravity Intelligence..."):
-                import requests
-                
-                # Direct REST call matching exactly with io-assist-anti-gravity reference
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GOOGLE_API_KEY}"
-                
-                user_msg = f"Document Type: {doc_type}\nCase Info: {fir_details}, {station}\nInput: {raw_input}"
-                
-                payload = {
-                    "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
-                    "contents": [{"parts": [{"text": user_msg}]}],
-                    "generationConfig": {
-                        "temperature": 0.2,
-                        "maxOutputTokens": 8192,
-                        "candidateCount": 1
-                    }
+    else:
+        with st.spinner("Processing with Anti-Gravity Intelligence..."):
+            import requests
+            
+            # Direct REST call matching exactly with io-assist-anti-gravity reference
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GOOGLE_API_KEY}"
+            
+            user_msg = f"Document Type: {doc_type}\nCase Info: {fir_details}, {station}\nInput: {raw_input}"
+            
+            payload = {
+                "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
+                "contents": [{"parts": [{"text": user_msg}]}],
+                "generationConfig": {
+                    "temperature": 0.2,
+                    "maxOutputTokens": 8192,
+                    "candidateCount": 1
                 }
-                
-                try:
-                    resp = requests.post(url, json=payload, timeout=90)
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        candidates = data.get("candidates", [])
-                        if candidates:
-                            raw_resp = candidates[0]["content"]["parts"][0]["text"]
-                            draft_part = raw_resp
-                            risk_part = ""
-                            
-                            # Parse out the two sections we defined in the prompt
-                            if "--- DEFENSE_RISK_ANALYSIS ---" in raw_resp:
-                                parts = raw_resp.split("--- DEFENSE_RISK_ANALYSIS ---")
-                                draft_part = parts[0].replace("--- DRAFT ---", "").strip()
-                                risk_part = parts[1].strip()
-                            else:
-                                draft_part = raw_resp.replace("--- DRAFT ---", "").strip()
-                                
-                            st.session_state.output = draft_part
-                            st.session_state.defense_risks = risk_part
+            }
+            
+            try:
+                resp = requests.post(url, json=payload, timeout=90)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    candidates = data.get("candidates", [])
+                    if candidates:
+                        raw_resp = candidates[0]["content"]["parts"][0]["text"]
+                        draft_part = raw_resp
+                        risk_part = ""
+                        
+                        # Parse out the two sections we defined in the prompt
+                        if "--- DEFENSE_RISK_ANALYSIS ---" in raw_resp:
+                            parts = raw_resp.split("--- DEFENSE_RISK_ANALYSIS ---")
+                            draft_part = parts[0].replace("--- DRAFT ---", "").strip()
+                            risk_part = parts[1].strip()
                         else:
-                            st.error("🚨 Error: Empty response from Gemini. Try adding more notes.")
-                    elif resp.status_code == 400:
-                        st.error("🚨 API Key Error: Invalid API key. Please check your Secrets configuration.")
-                    elif resp.status_code == 429:
-                        st.error("🚨 Quota Error: Rate limit hit. Wait 1 minute and try again.")
-                    elif resp.status_code == 404:
-                        st.error(f"🚨 Model Error (404): Model not found. API Response: {resp.text[:200]}")
+                            draft_part = raw_resp.replace("--- DRAFT ---", "").strip()
+                            
+                        st.session_state.output = draft_part
+                        st.session_state.defense_risks = risk_part
                     else:
-                        st.error(f"🚨 API Error ({resp.status_code}): {resp.text[:300]}")
-                except requests.exceptions.Timeout:
-                    st.error("🚨 Timeout: Server took too long. Check your internet and try again.")
-                except Exception as e:
-                    st.error(f"🚨 Connection Error: {str(e)}")
+                        st.error("🚨 Error: Empty response from Gemini. Try adding more notes.")
+                elif resp.status_code == 400:
+                    st.error("🚨 API Key Error: Invalid API key. Please check your Secrets configuration.")
+                elif resp.status_code == 429:
+                    st.error("🚨 Quota Error: Rate limit hit. Wait 1 minute and try again.")
+                elif resp.status_code == 404:
+                    st.error(f"🚨 Model Error (404): Model not found. API Response: {resp.text[:200]}")
+                else:
+                    st.error(f"🚨 API Error ({resp.status_code}): {resp.text[:300]}")
+            except requests.exceptions.Timeout:
+                st.error("🚨 Timeout: Server took too long. Check your internet and try again.")
+            except Exception as e:
+                st.error(f"🚨 Connection Error: {str(e)}")
 
 st.markdown("---")
 st.markdown("### 📜 CCTNS Ready Draft")
