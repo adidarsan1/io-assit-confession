@@ -67,11 +67,15 @@ with col1:
             st.error("Please enter some notes!")
         else:
             with st.spinner("Processing with Anti-Gravity Intelligence..."):
-                model = genai.GenerativeModel('gemini-1.5-pro')
-                full_prompt = f"{SYSTEM_PROMPT}\n\nDocument Type: {doc_type}\nCase Info: {fir_details}, {station}\nInput: {raw_input}"
-                
-                response = model.generate_content(full_prompt)
-                st.session_state.output = response.text
+                try:
+                    # Standard model, highly reliable
+                    model = genai.GenerativeModel('gemini-1.5-flash')
+                    full_prompt = f"{SYSTEM_PROMPT}\n\nDocument Type: {doc_type}\nCase Info: {fir_details}, {station}\nInput: {raw_input}"
+                    
+                    response = model.generate_content(full_prompt)
+                    st.session_state.output = response.text
+                except Exception as e:
+                    st.error(f"Error generating content: {str(e)}")
 
 with col2:
     st.markdown("### 📜 CCTNS Ready Draft")
