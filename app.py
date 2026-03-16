@@ -131,7 +131,8 @@ with col1:
 with col2:
     st.markdown("### 📜 CCTNS Ready Draft")
     if 'output' in st.session_state:
-        st.text_area("Copy this to CCTNS:", value=st.session_state.output, height=250)
+        st.markdown("<p style='color: #a0a0a0; font-size: 0.9rem; margin-bottom: 5px;'>Use the copy icon on the top right of the box below to copy to CCTNS.</p>", unsafe_allow_html=True)
+        st.code(st.session_state.output, language="markdown")
         
         # Display Defense Risk Analysis below the draft in a visual warning box
         if st.session_state.get('defense_risks'):
