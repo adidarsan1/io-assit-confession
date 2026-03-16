@@ -42,7 +42,12 @@ Provide a bulleted list of missing details from the IO's input that the defense 
 """
 
 # 3. Streamlit UI (The "Anti-Gravity" Theme)
-st.set_page_config(page_title="Anti-Gravity IO Assist", page_icon="👮", layout="wide")
+st.set_page_config(
+    page_title="Anti-Gravity IO Assist", 
+    page_icon="👮", 
+    layout="centered",
+    initial_sidebar_state="collapsed"
+)
 
 st.markdown("""
     <style>
@@ -65,15 +70,14 @@ with st.sidebar:
     st.info("Note: Recent Judgement standards applied to prevent flaws.")
 
 # Main Input
-col1, col2 = st.columns(2)
+st.markdown("### 📝 Enter Raw Notes (Tanglish/Local)")
+st.info("💡 Pro-Tip: Use your mobile keyboard's microphone 🎙️ for fast Tamil voice typing.")
 
-with col1:
-    st.markdown("### 📝 Enter Raw Notes (Tanglish/Local)")
-    raw_input = st.text_area("Example: Accused knife-ah bridge pakkam ditch-la hidden panni vachiruken nu sonnan. 2 witnesses irukanga.", height=350)
-    
-    if st.button("GENERATE LEGAL DRAFT"):
-        if not raw_input:
-            st.error("Please enter some notes!")
+raw_input = st.text_area("Example: Accused knife-ah bridge pakkam ditch-la hidden panni vachiruken nu sonnan. 2 witnesses irukanga.", height=200)
+
+if st.button("🚀 GENERATE LEGAL DRAFT", type="primary"):
+    if not raw_input:
+        st.error("Please enter some notes!")
         else:
             with st.spinner("Processing with Anti-Gravity Intelligence..."):
                 import requests
@@ -128,20 +132,20 @@ with col1:
                 except Exception as e:
                     st.error(f"🚨 Connection Error: {str(e)}")
 
-with col2:
-    st.markdown("### 📜 CCTNS Ready Draft")
-    if 'output' in st.session_state:
-        st.markdown("<p style='color: #a0a0a0; font-size: 0.9rem; margin-bottom: 5px;'>Use the copy icon on the top right of the box below to copy to CCTNS.</p>", unsafe_allow_html=True)
-        st.code(st.session_state.output, language="markdown")
+st.markdown("---")
+st.markdown("### 📜 CCTNS Ready Draft")
+if 'output' in st.session_state:
+    st.markdown("<p style='color: #a0a0a0; font-size: 0.9rem; margin-bottom: 5px;'>Use the copy icon on the top right of the box below to copy to CCTNS.</p>", unsafe_allow_html=True)
+    st.code(st.session_state.output, language="markdown")
+    
+    # Display Defense Risk Analysis below the draft in a visual warning box
+    if st.session_state.get('defense_risks'):
+        st.markdown("### 🛡️ Defense Risk Analysis")
+        st.warning(st.session_state.defense_risks)
         
-        # Display Defense Risk Analysis below the draft in a visual warning box
-        if st.session_state.get('defense_risks'):
-            st.markdown("### 🛡️ Defense Risk Analysis")
-            st.warning(st.session_state.defense_risks)
-            
-        st.success("Defense-Proofing Clauses Added Successfully!")
-    else:
-        st.info("The formal draft will appear here.")
+    st.success("Defense-Proofing Clauses Added Successfully!")
+else:
+    st.info("The formal draft will appear here.")
 
 st.divider()
 st.caption("Anti-Gravity IO Tool v2.0 | Designed for Tamil Nadu Police | Procedural Law Compliant")
