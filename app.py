@@ -67,15 +67,42 @@ with col1:
             st.error("Please enter some notes!")
         else:
             with st.spinner("Processing with Anti-Gravity Intelligence..."):
+                import requests
+                
+                # Direct REST call to bypass Streamlit Cloud gRPC/routing issues
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={GOOGLE_API_KEY}"
+                
+                full_prompt = f"{SYSTEM_PROMPT}\n\nDocument Type: {doc_type}\nCase Info: {fir_details}, {station}\nInput: {raw_input}"
+                
+                payload = {
+                    "contents": [{"parts": [{"text": full_prompt}]}],
+                    "generationConfig": {
+                        "temperature": 0.2,
+                        "maxOutputTokens": 8192,
+                    }
+                }
+                
                 try:
-                    # Standard model, highly reliable
-                    model = genai.GenerativeModel('gemini-1.5-flash')
-                    full_prompt = f"{SYSTEM_PROMPT}\n\nDocument Type: {doc_type}\nCase Info: {fir_details}, {station}\nInput: {raw_input}"
-                    
-                    response = model.generate_content(full_prompt)
-                    st.session_state.output = response.text
+                    resp = requests.post(url, json=payload, timeout=90)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        candidates = data.get("candidates", [])
+                        if candidates:
+                            st.session_state.output = candidates[0]["content"]["parts"][0]["text"]
+                        else:
+                            st.error("🚨 Error: Empty response from Gemini. Try adding more notes.")
+                    elif resp.status_code == 400:
+                        st.error("🚨 API Key Error: Invalid API key. Please check your Secrets configuration.")
+                    elif resp.status_code == 429:
+                        st.error("🚨 Quota Error: Rate limit hit. Wait 1 minute and try again.")
+                    elif resp.status_code == 404:
+                        st.error(f"🚨 Model Error (404): Model not found. API Response: {resp.text[:200]}")
+                    else:
+                        st.error(f"🚨 API Error ({resp.status_code}): {resp.text[:300]}")
+                except requests.exceptions.Timeout:
+                    st.error("🚨 Timeout: Server took too long. Check your internet and try again.")
                 except Exception as e:
-                    st.error(f"Error generating content: {str(e)}")
+                    st.error(f"🚨 Connection Error: {str(e)}")
 
 with col2:
     st.markdown("### 📜 CCTNS Ready Draft")
