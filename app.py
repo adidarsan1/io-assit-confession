@@ -69,16 +69,18 @@ with col1:
             with st.spinner("Processing with Anti-Gravity Intelligence..."):
                 import requests
                 
-                # Direct REST call to bypass Streamlit Cloud gRPC/routing issues
-                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={GOOGLE_API_KEY}"
+                # Direct REST call matching exactly with io-assist-anti-gravity reference
+                url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={GOOGLE_API_KEY}"
                 
-                full_prompt = f"{SYSTEM_PROMPT}\n\nDocument Type: {doc_type}\nCase Info: {fir_details}, {station}\nInput: {raw_input}"
+                user_msg = f"Document Type: {doc_type}\nCase Info: {fir_details}, {station}\nInput: {raw_input}"
                 
                 payload = {
-                    "contents": [{"parts": [{"text": full_prompt}]}],
+                    "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
+                    "contents": [{"parts": [{"text": user_msg}]}],
                     "generationConfig": {
                         "temperature": 0.2,
                         "maxOutputTokens": 8192,
+                        "candidateCount": 1
                     }
                 }
                 
