@@ -29,7 +29,7 @@ Rules to avoid Loophole (Defense-Proofing):
 Format your response EXACTLY like this with these exact sections:
 
 --- DRAFT ---
-(Header: சம்பவ இட ஆய்வு மகஜர் / ஒப்புதல் வாக்குமூலம்)
+(Header: [Insert Police Station Name] காவல் நிலையம் - [Insert Document Type] - [Insert FIR No/Section])
 (Body: Professional Legal Prose)
 (Signature Clause: "சாட்சிகளுக்கு வாசித்துக் காட்டப்பட்டு சம்மதம் பெறப்பட்டது.")
 
